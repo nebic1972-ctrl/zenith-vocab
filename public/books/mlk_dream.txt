@@ -1,0 +1,1 @@
+I Have a Dream — Martin Luther King Jr. Bu konuşmanın tam metni henüz eklenmedi. Placeholder: 1963 Washington yürüyüşü; eşitlik ve özgürlük vizyonu. Gerçek içerik ileride public/books klasörüne mlk_dream.pdf veya tam metin eklenerek yüklenecektir.

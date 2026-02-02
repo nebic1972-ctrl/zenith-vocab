@@ -1,0 +1,1 @@
+Ay'a Gitmeyi Seçiyoruz — John F. Kennedy. Bu konuşmanın tam metni henüz eklenmedi. Placeholder: 1962 Rice Üniversitesi konuşması; ABD'nin Ay hedefi. Gerçek içerik ileride public/books klasörüne jfk_moon.pdf veya tam metin eklenerek yüklenecektir.

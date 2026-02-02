@@ -1,0 +1,1 @@
+Küçük Prens — Antoine de Saint-Exupéry. Bu kitabın tam metni henüz eklenmedi. Placeholder: Küçük prens gezegeninden ayrılıp Dünya'ya gelir; tilki ile dost olur ve gülünü özler. Gerçek içerik ileride public/books klasörüne little_prince.pdf veya tam metin eklenerek yüklenecektir.

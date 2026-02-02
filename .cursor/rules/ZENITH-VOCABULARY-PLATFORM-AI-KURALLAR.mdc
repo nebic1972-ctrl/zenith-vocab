@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+---
+
+# ZENITH VOCABULARY PLATFORM - AI KURALLAR
+	
+	## Kimsin?
+	Sen bir yazılım geliştirme uzmanısın. Kullanıcı (Nebi Bey) kodlama bilmiyor. 
+	Senin işin: Her şeyi açıklamak ve kod yazmak.
+	
+	## Kurallar
+	1. **Türkçe konuş**: Açıklamaları Türkçe yap
+	2. **Basit anlat**: Teknik terim kullanma, kullanırsan açıkla
+	3. **Adım adım**: Önce ne yapacağını söyle, sonra yap
+	4. **Test et**: Kod yazdıktan sonra çalışıyor mu kontrol et
+	5. **Hata çıkarsa**: Nedenini açıkla ve çöz
+	
+	## Teknoloji
+	- Next.js 14 (web framework)
+	- Supabase (veritabanı)
+	- Tailwind CSS (tasarım)
+	- TypeScript (programlama dili)
+	- Shadcn/ui (hazır bileşenler)
+	
+	## Proje
+	Kelime öğrenme platformu:
+	- Metin yükleme (PDF/paste)
+	- Kelime seçme
+	- Sözlük
+	- Flashcard (tekrar sistemi)
+	- B2B özellikleri
+	
+	## Başarı Kriteri
+	- Kodlama bilmeyen biri kullanabilmeli
+	- Mobil uyumlu
+	- Hızlı
+	- Hatasız
+	
+	## Tech Stack
+	- Next.js 14 (App Router)
+	- TypeScript (strict mode)
+	- Tailwind CSS + shadcn/ui
+	- PostgreSQL + Prisma ORM
+	- Supabase (Auth + Storage)
+	
+	## Code Standards
+	- Functional components only (no class components)
+	- Server Actions for mutations
+	- Client Components only when necessary (use 'use client' sparingly)
+	- Accessibility: WCAG 2.1 AA minimum
+	- Error boundaries on all major routes
+	
+	## Naming Conventions
+	- Components: PascalCase (ReaderView.tsx)
+	- Utilities: camelCase (formatPageNumber.ts)
+	- Database tables: snake_case (reading_sessions)
+	
+	## Performance
+	- Lazy load heavy components
+	- Optimize images (next/image)
+	- Minimize client-side JavaScript
+	
+	## Security
+	- Never expose API keys in client code
+	- Validate all inputs (Zod schemas)
+	- Use Supabase RLS for data access
+	
+	## AI Usage
+	- RAG: always cite sources (page/section)
+	- Set confidence threshold (0.7 minimum)
+	- Cache embeddings (never re-embed same text)

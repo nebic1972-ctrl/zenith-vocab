@@ -1,0 +1,121 @@
+# NEUROREAD 2.0 - GOOGLE VISION + GEMINI UPGRADE
+
+## PROJE DURUMU
+- Framework: Next.js (App Router) - MEVCUT
+- Veritabanı: Supabase - MEVCUT
+- State: Zustand (store/) - MEVCUT
+- Stil: Tailwind CSS - MEVCUT
+
+## TAMAMLANAN ÖZELLİKLER (NeuroRead 2.0)
+- Google Cloud Vision API (OCR) – core/google/vision.ts, capture sayfası
+- Google Gemini 1.5 Pro (AI Flashcard) – core/google/gemini.ts, Kelimelerim, Reader kart butonu
+- PWA (Mobil destek) – manifest, next-pwa, PWAInstallPrompt, /offline
+- Merkezi güvenlik – middleware.ts (rate limit /api/*, Supabase session)
+- Kelimelerim – /vocabulary, vocabulary tablosu, createFlashcardFromSelection, SelectionFlashcardButton
+- Health API – GET /api/health
+
+## KODLAMA KURALLARI (Cursor İçin)
+
+### 1. Dosya Organizasyonu
+- Yeni özellikler `src/features/` altına
+- Google API'ler `src/core/google/` altına
+- Mevcut dosyalara DOKUNMA (bozmayalım)
+
+### 2. Yeni Klasör Yapısı
+
+```
+src/
+├── features/               (YENİ - iş mantığı burada)
+│   ├── vision/            (YENİ - kamera + OCR)
+│   │   ├── components/
+│   │   │   └── MobileCamera.tsx
+│   │   └── actions/
+│   │       └── process-image.ts
+│   └── learning/          (YENİ - AI flashcard)
+│       ├── components/
+│       │   └── FlashcardGenerator.tsx
+│       └── actions/
+│           └── create-flashcard.ts
+│
+├── core/
+│   └── google/            (YENİ - API clients)
+│       ├── vision.ts
+│       └── gemini.ts
+├── lib/
+│   └── supabase/          (MEVCUT - değişmeyecek)
+│
+├── app/                   (MEVCUT - sadece yeni route eklenecek)
+│   ├── capture/           (YENİ - kamera sayfası)
+│   └── ... (diğerleri aynı)
+│
+└── middleware.ts          (YENİ - güvenlik)
+```
+
+### 3. Güvenlik Kuralları
+- Tüm Google API çağrıları Server Actions ile (`'use server'`)
+- API key'ler ASLA client-side kodda
+- Rate limiting: Dakikada 10 istek
+
+### 4. Mobil-First
+- PWA manifest.json
+- Kamera API (arka kamera)
+- Touch-friendly butonlar (44x44px)
+
+### 5. Import Kuralları
+```typescript
+// Mevcut kodları kullan
+import { createClient } from '@/lib/supabase/client'; // MEVCUT
+import { useNeuroStore } from '@/store/useNeuroStore'; // MEVCUT
+
+// Yeni kodlar
+import { detectDocumentText } from '@/core/google/vision'; // YENİ
+import { generateFlashcard } from '@/core/google/gemini'; // YENİ
+```
+
+### 6. YASAKLAR
+- ❌ Mevcut app/ klasöründeki dosyaları değiştirme
+- ❌ components/ klasöründeki dosyaları silme
+- ❌ store/useNeuroStore.ts yapısını bozma
+- ❌ API key'leri client-side kodda gösterme
+
+### ONAY PROTOKOLÜ
+Her değişiklikten sonra sor: "Bu değişikliği onaylıyor musunuz?"
+
+### 7. Genel Kurallar
+- Yeni kod `src/features/` veya `src/core/google/` içinde yazılır; mevcut `app/`, `components/`, `lib/` yapısı bozulmaz.
+- Google API anahtarları ve hassas bilgiler ortam değişkenlerinde tutulur (`.env.local`); kod içine yazılmaz.
+- TypeScript kullan; yeni dosyalar için uygun tipler `src/types/` veya ilgili feature içinde tanımlanır.
+
+## TAMAMLANAN FAZLAR (1–30)
+| Faz | İçerik |
+|-----|--------|
+| 1 | Paketler, .cursorrules, .env.local |
+| 2 | Google Vision + Gemini (core), middleware rate limit |
+| 3 | Capture, kamera → library, /reader?bookId= |
+| 4 | PWA manifest, next-pwa, PWAInstallPrompt |
+| 5 | createFlashcardFromSelection, vocabulary migration |
+| 6 | Kelimelerim sayfası, silme, Sidebar link |
+| 7 | Kelimelerim "Yeni kart oluştur" (AI form) |
+| 8 | SelectionFlashcardButton, /offline |
+| 9 | Reader "Kart oluştur" butonu |
+| 10 | SETUP_RECIPE §5 (NeuroRead 2.0 kurulum) |
+| 11 | /api/health, README NeuroRead 2.0 |
+| 12 | .cursorrules durum özeti |
+| 13 | Kelimelerim CSV dışa aktarma |
+| 14 | 404 sayfasına Dashboard linki, dokümantasyon (faz tablosu) |
+| 15 | Kelimelerim arama (kelime / açıklama filtre) |
+| 16 | Reader Space = play/pause, error sayfasına Dashboard linki |
+| 17 | Kelimelerim sıralama (En yeni / En eski / Kelime A-Z) |
+| 18 | Reader Escape = zen mode toggle |
+| 19 | Reader okuma ilerleme göstergesi (X / Y kelime + progress bar) |
+| 20 | Okuma ilerlemesi: reading_progress tablosu, kaldığı yerden devam, debounced kayıt |
+| 21 | Kütüphane: kitap kartında ilerleme çubuğu, "Kaldığı yerden devam" butonu |
+| 22 | Reader "Baştan oku" butonu: ilerlemeyi sıfırlayıp veritabanına kaydeder |
+| 23 | Dashboard "Kaldığı yerden devam": son okunan kitaba tek tıkla reader linki |
+| 24 | Kelimelerim kitaba göre filtre (Tüm kitaplar / Kitapsız / kitap adı) |
+| 25 | Kütüphane sıralama: En yeni / En son okunan / İlerleme yüksek |
+| 26 | Profile okuma istatistikleri (kitap, kelime, kelime kartı) |
+| 27 | Dashboard Kelimelerim / Neuro Gym kısayolları |
+| 28 | Reader klavye kısayolları yardımı (HelpCircle Popover) |
+| 29 | Kelimelerim kart düzenleme (tanım / örnek cümle) |
+| 30 | PWA okuma hatırlatması (ReadingReminderCard + Toast) |

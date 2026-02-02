@@ -1,0 +1,11 @@
+# Engines Directory
+# 
+# This directory contains reading engine implementations.
+# Each engine (RSVP, Bionic, etc.) should be modular and swappable.
+#
+# Example structure:
+# - RSVPEngine.ts
+# - BionicEngine.ts
+# - AdaptiveEngine.ts (wrapper that selects appropriate engine)
+#
+# Philosophy: Engines are isolated, testable, and interchangeable.

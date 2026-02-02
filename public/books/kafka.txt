@@ -1,0 +1,1 @@
+Dönüşüm — Franz Kafka. Bu kitabın tam metni henüz eklenmedi. Placeholder: Gregor Samsa bir sabah kendini dev bir böceğe dönüşmüş bulur. Kafka'nın bu novellası yabancılaşma ve aile üzerine. Gerçek içerik ileride public/books klasörüne kafka.pdf veya tam metin eklenerek yüklenecektir.
