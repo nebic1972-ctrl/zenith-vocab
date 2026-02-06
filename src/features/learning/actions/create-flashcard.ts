@@ -103,8 +103,8 @@ export async function createFlashcardFromSelection(
     .insert({
       user_id: user.id,
       word: front,
-      definition: back,
-      example_sentence: example,
+      definition: (back && back.trim()) || 'Tanım yok',
+      example_sentence: example || null,
       book_id: bookId || null,
     })
     .select("id, word, definition, example_sentence")

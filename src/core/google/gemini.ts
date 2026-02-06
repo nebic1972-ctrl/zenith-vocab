@@ -24,10 +24,13 @@ export interface GenerateFlashcardError {
 
 export type GenerateFlashcardResult = GenerateFlashcardSuccess | GenerateFlashcardError;
 
-// v1 endpoint (v1beta yerine - model uyumluluğu için)
+// ✅ SADECE MODEL İSMİ (Versiyonu SDK yönetsin)
+// Gemini 2.5 Flash - kararlı ve hızlı model
+const GEMINI_MODEL = 'gemini-2.5-flash';
+
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
-  baseURL: "https://generativelanguage.googleapis.com/v1",
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta',
 });
 
 /** Tek kelime/kavram için flashcard (createFlashcardFromSelection için). */
@@ -65,7 +68,7 @@ JSON formatı (bu formatı TAM OLARAK kullan):
     console.log("🔍 Google Gemini API çağrısı başladı:", { word, context });
 
     const { text } = await generateText({
-      model: google("gemini-2.5-flash"),
+      model: google(GEMINI_MODEL),
       prompt,
     });
 
@@ -121,7 +124,7 @@ export async function generateFlashcardsFromText(
     const prompt = `Aşağıdaki metinden Türkçe öğrenme kartları (flashcard) üret. Her kartın "front" (soru/başlık) ve "back" (cevap/açıklama) alanı olsun. En fazla 5 kart. Sadece JSON döndür: {"cards":[{"front":"...","back":"..."}]}\n\nMetin:\n${text.slice(0, 12000)}`;
 
     const { object } = await generateObject({
-      model: google("gemini-2.5-flash"),
+      model: google(GEMINI_MODEL),
       schema: flashcardArraySchema,
       prompt,
     });

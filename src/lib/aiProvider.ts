@@ -70,6 +70,10 @@ const MOCK_QUIZ: QuizItem[] = [
   },
 ];
 
+// ✅ GEMINI 2.5 FLASH (Kararlı & Hızlı)
+const GEMINI_API_VERSION = 'v1beta';
+const GEMINI_MODEL = 'gemini-2.5-flash';
+
 function extractJson(text: string): string {
   const trimmed = text.trim();
   const codeBlock = /^```(?:json)?\s*([\s\S]*?)```$/m.exec(trimmed);
@@ -87,7 +91,7 @@ export const generateQuiz = async (content: string): Promise<QuizItem[] | null> 
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/${GEMINI_API_VERSION}/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

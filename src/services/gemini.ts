@@ -55,7 +55,7 @@ export async function generateQuizFromText(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `Aşağıdaki metni analiz et ve Türkçe dilinde 3 adet çoktan seçmeli soru oluştur...
     Metin: ${text.slice(0, 8000)}`;

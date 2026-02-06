@@ -33,7 +33,7 @@ export default function CognitiveRadar() {
       <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
         Bilişsel Profil
       </h3>
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0" style={{ width: '100%', height: '250px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid stroke="#333" />

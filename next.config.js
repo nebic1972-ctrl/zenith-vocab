@@ -7,6 +7,9 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
+  // Resend Node.js modülleri (stream vb.) kullanır - Edge'de çalışmaz
+  serverExternalPackages: ['resend'],
+
   // 🚀 Build Hızlandırma
   reactStrictMode: false,
   productionBrowserSourceMaps: false,

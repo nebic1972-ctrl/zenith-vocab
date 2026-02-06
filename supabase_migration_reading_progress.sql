@@ -1,16 +1,17 @@
--- Migration: Okuma ilerlemesi (kullanıcı–kitap bazında)
--- Idempotent: tekrar çalıştırıldığında hata vermez.
--- Supabase SQL Editor'da çalıştırın.
--- NOT: Tablo zaten varsa (eski şema) önce DROP gerekebilir. Yeni kurulumda doğrudan çalıştırın.
+-- =============================================================================
+-- MIGRATION: reading_progress tablosu
+-- =============================================================================
+-- Supabase Dashboard > SQL Editor'da bu dosyanın içeriğini yapıştırıp çalıştırın.
+--
+-- ÖN KOŞUL: public.library tablosu mevcut olmalı.
+-- Kodun gönderdiği alanlar: user_id, book_id, current_position, last_read_at, updated_at
+-- Upsert conflict: (user_id, book_id)
+-- =============================================================================
 
--- =============================================================================
--- 1. Eski tabloyu kaldır (varsa, veri silinir – yeni kurulumda boş)
--- =============================================================================
+-- 1. Eski tabloyu kaldır (varsa)
 DROP TABLE IF EXISTS public.reading_progress CASCADE;
 
--- =============================================================================
--- 2. Tablo (yeni şema)
--- =============================================================================
+-- 2. Tablo oluştur
 CREATE TABLE public.reading_progress (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -26,20 +27,14 @@ CREATE TABLE public.reading_progress (
 );
 
 COMMENT ON TABLE public.reading_progress IS 'Kullanıcı başına kitap okuma ilerlemesi. Reader kaldığı yerden devam eder.';
-COMMENT ON COLUMN public.reading_progress.current_position IS 'Son okunan kelime indeksi (0 tabanlı).';
-COMMENT ON COLUMN public.reading_progress.progress_percentage IS 'İlerleme yüzdesi (0–100).';
-COMMENT ON COLUMN public.reading_progress.wpm IS 'Kayıtlı okuma hızı (kelime/dakika).';
+COMMENT ON COLUMN public.reading_progress.current_position IS 'Son okunan kelime indeksi (0 tabanlı). Kod: saveReadingProgress(bookId, position)';
 
--- =============================================================================
 -- 3. İndeksler
--- =============================================================================
 CREATE INDEX reading_progress_user_id_idx ON public.reading_progress(user_id);
 CREATE INDEX reading_progress_book_id_idx ON public.reading_progress(book_id);
 CREATE INDEX reading_progress_user_book_idx ON public.reading_progress(user_id, book_id);
 
--- =============================================================================
--- 4. RLS (Row Level Security)
--- =============================================================================
+-- 4. RLS
 ALTER TABLE public.reading_progress ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Users can view their own reading progress" ON public.reading_progress;

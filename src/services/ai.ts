@@ -43,7 +43,7 @@ export const generateQuizFromText = async (text: string): Promise<Question[]> =>
   try {
     // 2. Gemini'yi Başlat
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // 3. Yapay Zekaya Emir Ver (Prompt)
     // Maliyetten tasarruf için metnin sadece ilk 3000 karakterini gönderiyoruz.
@@ -95,7 +95,7 @@ export const translateText = async (text: string): Promise<string> => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       Aşağıdaki metni akıcı ve edebi bir Türkçeye çevir. Sadece çeviriyi ver, başka açıklama yapma.
@@ -120,7 +120,7 @@ export const defineWord = async (word: string): Promise<{ definition: string; tr
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       "${word}" kelimesini analiz et.
@@ -150,7 +150,7 @@ export const extractContentFromUrl = async (url: string): Promise<{ title: strin
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       Şu web adresindeki ana makale içeriğini ve başlığını çıkar: ${url}
@@ -180,7 +180,7 @@ export const summarizeBook = async (content: string): Promise<string> => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Maliyet tasarrufu için metnin başından 5000 karakter gönderelim
     const prompt = `

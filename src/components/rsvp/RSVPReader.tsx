@@ -189,7 +189,7 @@ export default function RSVPReader({ content, initialWpm, bookId, onClose }: RSV
 
     try {
       const currentSentence = words.slice(Math.max(0, currentIndex - 5), currentIndex + 6).join(" ");
-      const response = await fetch("/api/flashcard", {
+      const response = await fetch("/api/flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word, context: currentSentence }),

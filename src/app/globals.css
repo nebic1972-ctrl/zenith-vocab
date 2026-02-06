@@ -2,16 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3D Flip Animation */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 1000px 100%;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
 @layer base {
   :root {
-    /* Tüm sistemi Zorla Karanlık Yap */
-    --background: 0 0% 0%;
+    --background: 222 47% 4%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 222 47% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 72% 51%;
+    --primary: 217 91% 60%; 
     --primary-foreground: 210 40% 98%;
     --secondary: 217 32% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -21,26 +108,623 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 0 72% 51%;
-    --radius: 0.5rem;
+    --border: 217 32% 20%;
+    --input: 217 32% 20%;
+    --ring: 217 91% 60%;
+    --radius: 1rem;
   }
 }
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  body { @apply bg-background text-foreground antialiased; }
+}
+
+/* Dark mode base - ThemeContext ile senkron */
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 0 0 0;
+  }
+
+  .dark {
+    --background: 17 24 39; /* gray-900 */
+    --foreground: 255 255 255;
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-white antialiased transition-colors duration-300;
+  }
+}
+
+@layer components {
+  /* Ana Flashcard Kutusu */
+  .flashcard-main {
+    @apply bg-card border border-border shadow-2xl rounded-2xl p-8 transition-all duration-300;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Kelime Başlığı */
+  .flashcard-word {
+    @apply text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-white text-center;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  /* İpucu (Hint) Kutusu */
+  .hint-box {
+    @apply mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5 transition-all;
+  }
+
+  .hint-title {
+    @apply flex items-center gap-2 text-primary font-semibold text-sm mb-2 uppercase tracking-widest;
+  }
+
+  /* Kontrol Butonları */
+  .control-btn {
+    @apply flex-1 py-4 rounded-xl font-bold transition-all active:scale-95 text-white bg-secondary hover:bg-primary/20;
+  }
 }
 
 @layer utilities {
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-    20%, 40%, 60%, 80% { transform: translateX(4px); }
+  .perspective-1000 { perspective: 1000px; }
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+}
+
+/* ÖZEL RENK VE OKUNURLUK DÜZELTMELERİ (Global) */
+[class*="flashcard"] span, 
+[class*="flashcard"] p, 
+[class*="flashcard"] h1,
+[class*="flashcard"] h2 {
+  color: white !important;
+}
+
+[class*="flashcard"] .text-slate-500,
+[class*="flashcard"] .text-slate-400 {
+  color: #cbd5e1 !important; 
+}
+
+.text-blue-200 { color: #bfdbfe !important; }
+.text-slate-200 { color: #e2e8f0 !important; }
+.text-amber-500 { color: #f59e0b !important; }
+.border-blue-700 { border-color: #1d4ed8 !important; }
+/* ============================================
+   FIX: Input Kontrast Sorunu
+   ============================================ */
+
+/* Input fields - Dark theme */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  @apply bg-gray-800 border-gray-700 text-white placeholder-gray-500;
+  @apply focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20;
+  @apply transition-all duration-200;
+}
+
+/* Input focus state */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none border-blue-500 ring-2 ring-blue-500/20;
+}
+
+/* Disabled inputs */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  @apply bg-gray-900 text-gray-600 cursor-not-allowed;
+}
+
+/* ============================================
+   FIX: Button Kontrast
+   ============================================ */
+
+/* Primary button */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg;
+  @apply transition-all duration-200 shadow-lg shadow-blue-500/20;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Secondary button */
+.btn-secondary {
+  @apply bg-gray-800 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg;
+  @apply border border-gray-700 transition-all duration-200;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Danger button */
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg;
+  @apply transition-all duration-200 shadow-lg shadow-red-500/20;
+}
+
+/* Success button */
+.btn-success {
+  @apply bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg;
+  @apply transition-all duration-200 shadow-lg shadow-green-500/20;
+}
+
+/* ============================================
+   FIX: Card Kontrast
+   ============================================ */
+
+.card {
+  @apply bg-gray-900 border border-gray-800 rounded-xl p-6;
+  @apply shadow-lg hover:shadow-xl transition-shadow duration-200;
+}
+
+.card-header {
+  @apply text-white font-semibold text-lg mb-4;
+}
+
+.card-body {
+  @apply text-gray-300;
+}
+
+/* ============================================
+   FIX: Text Kontrast
+   ============================================ */
+
+/* Heading colors */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-white;
+}
+
+/* Paragraph colors */
+p {
+  @apply text-gray-300;
+}
+
+/* Muted text */
+.text-muted {
+  @apply text-gray-500;
+}
+
+/* ============================================
+   FIX: Flashcard Okları
+   ============================================ */
+
+.flashcard-nav-btn {
+  @apply bg-gray-800 hover:bg-gray-700 text-white;
+  @apply w-12 h-12 rounded-full flex items-center justify-center;
+  @apply border-2 border-gray-700 hover:border-blue-500;
+  @apply transition-all duration-200 shadow-lg;
+  @apply disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+.flashcard-nav-btn svg {
+  @apply w-6 h-6 text-white;
+}
+
+/* ============================================
+   FIX: Empty State
+   ============================================ */
+
+.empty-state {
+  @apply text-center py-16;
+}
+
+.empty-state-icon {
+  @apply w-20 h-20 mx-auto mb-4 text-gray-700;
+}
+
+.empty-state-title {
+  @apply text-xl font-semibold text-gray-400 mb-2;
+}
+
+.empty-state-description {
+  @apply text-gray-500 mb-6;
+}
+/* ============================================
+   LIGHT THEME SUPPORT
+   ============================================ */
+
+   .light {
+    --background: 255 255 255;
+    --foreground: 15 23 42;
   }
   
-  .animate-shake {
-    animation: shake 0.5s ease-in-out;
+  .light body {
+    @apply bg-white text-gray-900;
   }
+  
+  .light input,
+  .light textarea,
+  .light select {
+    @apply bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-400;
+  }
+  
+  .light .card {
+    @apply bg-white border-gray-200;
+  }
+  
+  .light .flashcard-nav-btn {
+    @apply bg-gray-200 hover:bg-gray-300 border-gray-300;
+  }
+  
+  .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+    @apply text-gray-900;
+  }
+  
+  .light p {
+    @apply text-gray-700;
+  }
+  
+  /* ============================================
+     ANIMATIONS
+     ============================================ */
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+  /* ============================================
+   LIGHT THEME SUPPORT
+   ============================================ */
+
+.light {
+  --background: 255 255 255;
+  --foreground: 15 23 42;
+  --card: 249 250 251;
+  --card-foreground: 15 23 42;
+  --border: 229 231 235;
+  --input: 229 231 235;
+}
+
+.light body {
+  @apply bg-white text-gray-900;
+}
+
+.light input,
+.light textarea,
+.light select {
+  @apply bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400;
+}
+
+.light input:focus,
+.light textarea:focus,
+.light select:focus {
+  @apply border-blue-500 ring-blue-500/20;
+}
+
+.light .card {
+  @apply bg-white border-gray-200;
+}
+
+.light .flashcard-nav-btn {
+  @apply bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-900;
+}
+
+.light .flashcard-nav-btn:hover:not(:disabled) {
+  @apply bg-blue-100 border-blue-500;
+}
+
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  @apply text-gray-900;
+}
+
+.light p {
+  @apply text-gray-700;
+}
+
+.light .text-muted {
+  @apply text-gray-500;
+}
+
+.light .empty-state-icon {
+  @apply text-gray-300;
+}
+
+.light .empty-state-title {
+  @apply text-gray-700;
+}
+
+.light .empty-state-description {
+  @apply text-gray-500;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation Classes */
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Stagger animations */
+.stagger-item {
+  opacity: 0;
+  animation: slideInUp 0.4s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+.stagger-item:nth-child(7) { animation-delay: 0.35s; }
+.stagger-item:nth-child(8) { animation-delay: 0.4s; }
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-bounce {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.skeleton {
+  @apply bg-gray-800 animate-pulse rounded;
+}
+
+.light .skeleton {
+  @apply bg-gray-200;
+}
+
+.spinner {
+  @apply w-8 h-8 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin;
+}
+
+.spinner-small {
+  @apply w-4 h-4 border-2 border-gray-600 border-t-blue-400 rounded-full animate-spin;
+}
+
+.light .spinner {
+  @apply border-gray-300 border-t-blue-500;
+}
+
+.light .spinner-small {
+  @apply border-gray-400 border-t-blue-500;
+}
+/* ============================================
+   FLASHCARD NAVIGATION BUTTONS
+   ============================================ */
+
+   .flashcard-nav-btn {
+    @apply w-14 h-14 rounded-full;
+    @apply bg-gray-800 hover:bg-gray-700;
+    @apply border-2 border-gray-700 hover:border-blue-500;
+    @apply text-gray-400 hover:text-white;
+    @apply flex items-center justify-center;
+    @apply transition-all duration-200;
+    @apply disabled:opacity-30 disabled:cursor-not-allowed;
+    @apply disabled:hover:bg-gray-800 disabled:hover:border-gray-700;
+    @apply shadow-lg hover:shadow-blue-500/30;
+  }
+  
+  .flashcard-nav-btn:active:not(:disabled) {
+    @apply scale-95;
+  }
+  
+  .flashcard-nav-btn:hover:not(:disabled) {
+    @apply shadow-xl shadow-blue-500/50;
+  }
+  
+  /* Light mode */
+  .light .flashcard-nav-btn {
+    @apply bg-gray-100 hover:bg-gray-200;
+    @apply border-gray-300 hover:border-blue-500;
+    @apply text-gray-600 hover:text-gray-900;
+    @apply disabled:hover:bg-gray-100 disabled:hover:border-gray-300;
+  }
+
+/* ============================================
+   INPUT IMPROVEMENTS
+   ============================================ */
+
+/* Input placeholder opacity */
+input::placeholder,
+textarea::placeholder {
+  @apply opacity-50;
+}
+
+/* Dark mode specific improvements */
+@media (prefers-color-scheme: dark) {
+  input::placeholder,
+  textarea::placeholder {
+    @apply opacity-60;
+  }
+}
+
+/* Select styling */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
+}
+
+/* Scrollbar styling for overflow-y-auto */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800 rounded-full;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600;
 }

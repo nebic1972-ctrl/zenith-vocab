@@ -70,7 +70,7 @@ Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
 
 **Vercel deploy:** Dashboard → Settings → Environment Variables → yukarıdaki tüm değerleri ekleyin.
 
-**API:** Google model `gemini-1.5-pro`; Vision endpoint `vision.googleapis.com/v1/images:annotate`. Değişken isimleri `.env.local` ile aynı olmalı.
+**API:** Google model `gemini-2.5-flash`; Vision endpoint `vision.googleapis.com/v1/images:annotate`. Değişken isimleri `.env.local` ile aynı olmalı.
 
 **API key değişikliği sonrası:** `.env.local` güncellediyseniz, Vercel'de de aynı değişkenleri güncelleyin. Settings → Environment Variables → **Save** → **Redeploy**.
 
