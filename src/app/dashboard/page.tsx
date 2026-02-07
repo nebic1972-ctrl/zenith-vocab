@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import MetricCard from '@/components/MetricCard'
 import AddWordModal from '@/components/AddWordModal'
@@ -32,8 +33,14 @@ interface SupabaseWord {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [showAddWordModal, setShowAddWordModal] = useState(false)
+
+  useEffect(() => {
+    if (loading) return
+    if (!user) router.replace('/login')
+  }, [user, loading, router])
   const [showImportModal, setShowImportModal] = useState(false)
   const [stats, setStats] = useState({
     totalWords: 0,
@@ -155,6 +162,8 @@ export default function DashboardPage() {
     user?.user_metadata?.full_name ||
     user?.email?.split('@')[0] ||
     'Kullanıcı'
+
+  if (loading || !user) return null
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

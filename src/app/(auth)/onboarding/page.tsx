@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/contexts/AuthContext'
 import type { LanguageLevel, DailyWordGoal } from '@/types/auth'
 
 const STEPS = [
@@ -21,10 +22,22 @@ const DAILY_GOALS: DailyWordGoal[] = [5, 10, 20, 50]
 
 export default function OnboardingPage() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [languageLevel, setLanguageLevel] = useState<LanguageLevel>('B1')
   const [dailyGoal, setDailyGoal] = useState<DailyWordGoal>(10)
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) {
+      router.replace('/login')
+      return
+    }
+    if (user.user_metadata?.onboarding_completed) {
+      router.replace('/')
+    }
+  }, [user, authLoading, router])
 
   const handleComplete = async () => {
     setLoading(true)
@@ -63,6 +76,17 @@ export default function OnboardingPage() {
 
   const handlePrev = () => {
     if (step > 0) setStep((s) => s - 1)
+  }
+
+  if (authLoading || !user || user.user_metadata?.onboarding_completed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-deep-blue px-4">
+        <div className="flex items-center gap-2 text-accent-blue">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Yükleniyor...</span>
+        </div>
+      </div>
+    )
   }
 
   return (

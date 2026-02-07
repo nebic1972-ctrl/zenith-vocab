@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { Mail, Lock, User, Loader2, Chrome } from 'lucide-react'
 import Link from 'next/link'
@@ -12,7 +13,14 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const { signUp, signInWithGoogle } = useAuth()
+  const { signUp, signInWithGoogle, user, loading: authLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (authLoading || !user) return
+    const completed = Boolean(user.user_metadata?.onboarding_completed)
+    router.replace(completed ? '/' : '/onboarding')
+  }, [user, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

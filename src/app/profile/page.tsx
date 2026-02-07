@@ -1,13 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useNeuroStore } from '@/store/useNeuroStore';
 import CognitiveRadar from '@/components/CognitiveRadar';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Shield, Award, BookOpen, BookMarked, FileText } from 'lucide-react';
 
 export default function ProfilePage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const { xp } = useNeuroStore();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) router.replace('/login');
+  }, [user, loading, router]);
   const currentTier = xp >= 10000 ? 'Diamond' : xp >= 5000 ? 'Gold' : xp >= 1000 ? 'Silver' : 'Bronze';
   const league = { currentTier };
 
@@ -46,6 +55,8 @@ export default function ProfilePage() {
     };
     load();
   }, []);
+
+  if (loading || !user) return null;
 
   return (
     <div className="min-h-screen bg-[#050505] pl-72 pr-8 py-8 text-white">

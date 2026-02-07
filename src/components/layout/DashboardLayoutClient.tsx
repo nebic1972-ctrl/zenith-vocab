@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import TopNav from "./TopNav";
 import MobileNav from "./MobileNav";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardLayoutClient({
   children,
@@ -11,6 +13,19 @@ export default function DashboardLayoutClient({
   children: React.ReactNode;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
+
+  if (!loading && !user) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-black">

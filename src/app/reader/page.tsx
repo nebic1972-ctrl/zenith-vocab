@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useNeuroStore } from "@/store/useNeuroStore";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -709,6 +710,20 @@ function ReaderPage() {
   );
 }
 
+function ReaderPageWrapperInner() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) router.replace("/login");
+  }, [user, loading, router]);
+
+  if (loading || !user) return null;
+
+  return <ReaderPage />;
+}
+
 export default function ReaderPageWrapper() {
   return (
     <Suspense
@@ -718,7 +733,7 @@ export default function ReaderPageWrapper() {
         </div>
       }
     >
-      <ReaderPage />
+      <ReaderPageWrapperInner />
     </Suspense>
   );
 }

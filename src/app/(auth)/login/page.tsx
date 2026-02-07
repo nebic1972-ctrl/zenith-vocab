@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FcGoogle } from 'react-icons/fc'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { signInWithGoogle } from '@/lib/auth/auth-service'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/contexts/AuthContext'
 
 function LoginContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const error = searchParams.get('error')
 
@@ -21,6 +24,23 @@ function LoginContent() {
       })
     }
   }, [error])
+
+  useEffect(() => {
+    if (authLoading || !user) return
+    const completed = Boolean(user.user_metadata?.onboarding_completed)
+    router.replace(completed ? '/' : '/onboarding')
+  }, [user, authLoading, router])
+
+  if (authLoading || (user && !loading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-deep-blue px-4">
+        <div className="flex items-center gap-2 text-accent-blue">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Yükleniyor...</span>
+        </div>
+      </div>
+    )
+  }
 
   const handleGoogleLogin = async () => {
     setLoading(true)
