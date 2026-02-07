@@ -1,8 +1,12 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { isOnboardingCompleted } from '@/lib/auth/auth-utils'
 
 const authRoutes = ['/login', '/register', '/onboarding']
+
+function isOnboardingCompleted(metadata: Record<string, unknown> | null | undefined): boolean {
+  if (!metadata) return false
+  return Boolean(metadata.onboarding_completed)
+}
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
