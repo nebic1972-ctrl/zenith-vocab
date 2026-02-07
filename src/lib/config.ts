@@ -1,16 +1,15 @@
 /**
  * Güvenli ortam değişkeni wrapper'ı.
- * API anahtarlarını tek noktadan yönetir, eksikse net hata verir.
+ * Edge/Middleware ortamında hata fırlatmaz - fail-safe.
  */
-
-function getEnv(key: string, required = true): string {
-  const value = process.env[key]?.trim()
-  if (required && (!value || value === 'your_key_here_do_not_share')) {
-    throw new Error(
-      `[CONFIG] ${key} tanımlı değil! .env.local dosyasına ekleyin.`
-    )
+function getEnv(key: string, _required = false): string {
+  try {
+    const value = process.env[key]?.trim()
+    if (!value || value === 'your_key_here_do_not_share') return ''
+    return value
+  } catch {
+    return ''
   }
-  return value || ''
 }
 
 /**

@@ -1,12 +1,15 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
- * Supabase @supabase/ssr Edge Runtime ile uyumsuz olduğu için
- * auth kontrolü layout seviyesinde yapılıyor (DashboardLayoutClient).
- * Middleware sadece isteği geçiriyor.
+ * Edge Runtime - minimal passthrough.
+ * Auth layout seviyesinde (DashboardLayoutClient).
  */
 export async function middleware(request: NextRequest) {
-  return NextResponse.next()
+  try {
+    return NextResponse.next()
+  } catch {
+    return NextResponse.next()
+  }
 }
 
 export const config = {
