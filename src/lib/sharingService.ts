@@ -308,13 +308,18 @@ export async function searchPublicCollections(
 
 /**
  * Get collection categories for filtering
+ * RPC get_collection_categories gerekli - supabase_migration_explore_collections.sql
+ * Hata durumunda boş dizi döner (kategoriler opsiyonel)
  */
 export async function getCollectionCategories(): Promise<{ category: string; count: number }[]> {
   const supabase = createClient()
 
   const { data, error } = await supabase.rpc('get_collection_categories')
 
-  if (error) throw error
+  if (error) {
+    console.warn('get_collection_categories RPC failed (migration may not be run):', error.message)
+    return []
+  }
 
   return (data || []).map((cat: Record<string, unknown>) => ({
     category: String(cat.category || ''),

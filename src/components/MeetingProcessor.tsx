@@ -17,7 +17,10 @@ export default function MeetingProcessor() {
 
   const extractText = async (file: File): Promise<string> => {
     const ext = file.name.split('.').pop()?.toLowerCase();
-    if (ext === 'pdf') return extractTextFromPDF(file);
+    if (ext === 'pdf') {
+      const result = await extractTextFromPDF(file);
+      return result.text;
+    }
     if (ext === 'txt') return file.text();
     throw new Error('Sadece .txt ve .pdf desteklenir.');
   };

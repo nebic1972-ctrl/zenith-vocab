@@ -54,8 +54,49 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Session'ı yenile (önemli!)
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const pathname = request.nextUrl.pathname
+
+  // API routes - session güncelle, redirect yapma
+  if (pathname.startsWith('/api')) {
+    return response
+  }
+
+  // Public routes
+  const publicRoutes = [
+    '/login',
+    '/register',
+    '/auth/login',
+    '/auth/register',
+    '/auth/callback',
+    '/shared',
+    '/share',
+    '/offline',
+  ]
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  )
+
+  if (!user && !isPublicRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  if (
+    user &&
+    (pathname === '/login' ||
+      pathname === '/register' ||
+      pathname === '/auth/login' ||
+      pathname === '/auth/register')
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
 
   return response
 }

@@ -39,8 +39,19 @@ export default function SettingsPage() {
       const prefs = await getUserPreferences(user.id)
       setPreferences(prefs)
     } catch (error) {
-      console.error('Error loading preferences:', error)
-      toast.error('Ayarlar yüklenemedi')
+      console.warn('Preferences load failed:', error instanceof Error ? error.message : error)
+      setPreferences({
+        id: '',
+        userId: user.id,
+        emailNotificationsEnabled: true,
+        dailyReminderEnabled: true,
+        reminderTime: '09:00:00',
+        reminderTimezone: 'Europe/Istanbul',
+        pushNotificationsEnabled: false,
+        weeklyReportEnabled: true,
+        achievementNotifications: true
+      })
+      toast.error('Ayarlar yüklenemedi, varsayılanlar kullanılıyor')
     } finally {
       setLoading(false)
     }

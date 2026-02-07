@@ -125,6 +125,8 @@ $func$;
 -- ÖN KOŞUL: vocabulary_words.next_review_date sütunu (spaced repetition migration)
 -- Kullanıcının saat diliminde şu anki saat = reminder_time saati ise döner.
 -- Cron her saat başı çalışmalı (örn. :00'da).
+-- Dönüş tipi değiştiğinde önce eski fonksiyonu silmek gerekir.
+DROP FUNCTION IF EXISTS public.get_users_for_daily_reminder();
 CREATE OR REPLACE FUNCTION public.get_users_for_daily_reminder()
 RETURNS TABLE(
   user_id uuid,

@@ -6,7 +6,7 @@ Sistem ayağa kalkmazsa aşağıdaki adımları **hatanıza göre** uygulayın.
 
 ## 1. `relation "public.profiles" does not exist` veya column hatası
 
-**Çözüm:** Supabase SQL Editor’da migration’ları sırayla çalıştırın:
+**Çözüm:** Supabase SQL Editor'da migration'ları sırayla çalıştırın:
 
 - `supabase_migration_add_xp_level.sql` → `profiles` tablosuna `xp`, `level` ekler.
 - `supabase_migration_add_cover_and_storage.sql` → Kapak ve storage (gerekirse).
@@ -24,23 +24,17 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
 
-Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
+Değişiklikten sonra dev server'ı yeniden başlatın (`npm run dev`).
 
 ---
 
-## 3. `ClerkProvider not found`
-
-**Çözüm:** `src/app/layout.tsx` içinde `<ClerkProvider>` kullanılmamalı. Sadece `AuthProvider` (veya kendi auth’unuz) + `children` kalsın. Bu projede Clerk kullanılmıyor; auth Supabase ile yapılıyor. Eski koddan kalan referans varsa `npm uninstall @clerk/nextjs @clerk/clerk-react` ile paketleri kaldırın.
-
----
-
-## 4. Beyaz ekran / sayfa yüklenmiyor
+## 3. Beyaz ekran / sayfa yüklenmiyor
 
 **Çözüm:**
 
 1. Tarayıcıda **F12** → Console. "Hydration failed" veya benzeri hata var mı bakın.
 2. Varsa **Nükleer temizlik** yapın:
-   - Dev server’ı durdurun (Ctrl+C), Cursor/VS Code’u kapatın.
+   - Dev server'ı durdurun (Ctrl+C), Cursor/VS Code'u kapatın.
    - Yeni terminal (mümkünse yönetici olarak) açın.
    - Proje klasöründe:
      ```bat
@@ -53,7 +47,7 @@ Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
 
 ---
 
-## 5. NeuroRead 2.0 – Vision, Gemini, PWA, Kelimelerim
+## 4. NeuroRead 2.0 – Vision, Gemini, PWA, Kelimelerim
 
 **Gerekli .env.local** (esas alınacak dosya; kodda kullanılan değişken isimleri bu dosyayla aynı olmalı. `.env.example` şablon olarak kullanılabilir):
 
@@ -74,7 +68,7 @@ Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
 
 **API key değişikliği sonrası:** `.env.local` güncellediyseniz, Vercel'de de aynı değişkenleri güncelleyin. Settings → Environment Variables → **Save** → **Redeploy**.
 
-**Supabase migration sırası (SQL Editor’da sırayla):**
+**Supabase migration sırası (SQL Editor'da sırayla):**
 
 1. `supabase_migration_add_xp_level.sql` (profiles: xp, level)
 2. `supabase_migration_add_cover_and_storage.sql` (gerekirse)
@@ -92,9 +86,9 @@ Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
 | 4 | PWA (manifest, next-pwa, PWAInstallPrompt) |
 | 5 | createFlashcardFromSelection, vocabulary tablosu |
 | 6 | Kelimelerim sayfası (/vocabulary), silme, Sidebar link |
-| 7 | Kelimelerim’de “Yeni kart oluştur” (AI form) |
+| 7 | Kelimelerim'de "Yeni kart oluştur" (AI form) |
 | 8 | SelectionFlashcardButton, /offline sayfası |
-| 9 | Reader’da “Kart oluştur” butonu |
+| 9 | Reader'da "Kart oluştur" butonu |
 | 10 | Dokümantasyon (bu reçete) |
 | 11 | /api/health, README NeuroRead 2.0 |
 | 12 | .cursorrules durum özeti |
@@ -119,7 +113,7 @@ Değişiklikten sonra dev server’ı yeniden başlatın (`npm run dev`).
 
 **Sonraki aşamalar (öneri):** Liderlik/aktivite gerçek veri vb.
 
-**Önemli route’lar:** `/capture` (Belge Tara), `/vocabulary` (Kelimelerim), `/offline` (PWA çevrimdışı).
+**Önemli route'lar:** `/capture` (Belge Tara), `/vocabulary` (Kelimelerim), `/offline` (PWA çevrimdışı).
 
 ---
 

@@ -12,8 +12,20 @@ export interface UserPreferences {
   achievementNotifications: boolean
 }
 
+const DEFAULT_PREFERENCES: Omit<UserPreferences, 'id'> = {
+  userId: '',
+  emailNotificationsEnabled: true,
+  dailyReminderEnabled: true,
+  reminderTime: '09:00:00',
+  reminderTimezone: 'Europe/Istanbul',
+  pushNotificationsEnabled: false,
+  weeklyReportEnabled: true,
+  achievementNotifications: true
+}
+
 /**
  * Get user preferences (creates if not exists)
+ * RPC veya tablo yoksa varsayılan tercihler döner
  */
 export async function getUserPreferences(userId: string): Promise<UserPreferences> {
   const supabase = createClient()
@@ -22,20 +34,34 @@ export async function getUserPreferences(userId: string): Promise<UserPreference
     p_user_id: userId
   })
 
-  if (error) throw error
+  if (error) {
+    console.warn('get_user_preferences RPC failed (migration may not be run):', error.message)
+    return {
+      id: '',
+      ...DEFAULT_PREFERENCES,
+      userId
+    }
+  }
 
-  const prefs = data[0]
+  const prefs = data?.[0]
+  if (!prefs) {
+    return {
+      id: '',
+      ...DEFAULT_PREFERENCES,
+      userId
+    }
+  }
 
   return {
     id: prefs.id,
     userId: prefs.user_id,
-    emailNotificationsEnabled: prefs.email_notifications_enabled,
-    dailyReminderEnabled: prefs.daily_reminder_enabled,
-    reminderTime: prefs.reminder_time,
-    reminderTimezone: prefs.reminder_timezone,
-    pushNotificationsEnabled: prefs.push_notifications_enabled,
-    weeklyReportEnabled: prefs.weekly_report_enabled,
-    achievementNotifications: prefs.achievement_notifications
+    emailNotificationsEnabled: prefs.email_notifications_enabled ?? true,
+    dailyReminderEnabled: prefs.daily_reminder_enabled ?? true,
+    reminderTime: prefs.reminder_time ?? '09:00:00',
+    reminderTimezone: prefs.reminder_timezone ?? 'Europe/Istanbul',
+    pushNotificationsEnabled: prefs.push_notifications_enabled ?? false,
+    weeklyReportEnabled: prefs.weekly_report_enabled ?? true,
+    achievementNotifications: prefs.achievement_notifications ?? true
   }
 }
 

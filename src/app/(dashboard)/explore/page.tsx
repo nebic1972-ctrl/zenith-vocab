@@ -1,292 +1,288 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner' 
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
+import { createClient } from '@/lib/supabase/client'
 import {
   searchPublicCollections,
   getCollectionCategories,
   cloneSharedCollection,
-  generateShareUrl
+  type SharedCollection
 } from '@/lib/sharingService'
-import type { SharedCollection } from '@/lib/sharingService'
-import { Search, Compass, Eye, Copy, Download } from 'lucide-react'
-import toast from 'react-hot-toast'
-
-const colorClasses: Record<string, string> = {
-  blue: 'from-blue-500 to-blue-600',
-  green: 'from-green-500 to-green-600',
-  purple: 'from-purple-500 to-purple-600',
-  indigo: 'from-indigo-500 to-indigo-600',
-  orange: 'from-orange-500 to-orange-600',
-  cyan: 'from-cyan-500 to-cyan-600',
-  red: 'from-red-500 to-red-600',
-  yellow: 'from-yellow-500 to-yellow-600',
-  pink: 'from-pink-500 to-pink-600',
-  teal: 'from-teal-500 to-teal-600'
-}
-
-function ExploreCard({
-  collection,
-  onView,
-  onClone,
-  onCopyLink,
-  cloning
-}: {
-  collection: SharedCollection
-  onView: () => void
-  onClone: () => void
-  onCopyLink: () => void
-  cloning?: boolean
-}) {
-  const gradientClass = colorClasses[collection.color as keyof typeof colorClasses] || colorClasses.blue
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`bg-gradient-to-br ${gradientClass} rounded-xl p-6 text-white shadow-lg relative overflow-hidden`}
-    >
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -mr-12 -mt-12" />
-        <div className="absolute bottom-0 left-0 w-20 h-20 bg-white rounded-full -ml-10 -mb-10" />
-      </div>
-
-      <div className="relative z-10">
-        <div className="text-5xl mb-3">{collection.icon}</div>
-        <h3 className="text-xl font-bold mb-2">{collection.name}</h3>
-        <p className="text-white/80 text-sm mb-4 line-clamp-2">
-          {collection.description || 'Açıklama yok'}
-        </p>
-
-        <div className="flex items-center gap-4 text-sm mb-4">
-          <span>📚 {collection.wordCount} kelime</span>
-          <span>👁️ {collection.viewCount} görüntülenme</span>
-          <span>📋 {collection.cloneCount} kopyalama</span>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={onView}
-            className="flex-1 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-          >
-            <Eye size={18} />
-            Görüntüle
-          </button>
-          <button
-            onClick={onClone}
-            disabled={cloning}
-            className="flex-1 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download size={18} />
-            {cloning ? 'Kopyalanıyor...' : 'Kopyala'}
-          </button>
-          <button
-            onClick={onCopyLink}
-            className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-colors"
-            title="Linki kopyala"
-          >
-            <Copy size={18} />
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
 
 export default function ExplorePage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const [user, setUser] = useState<any>(null)
   const [collections, setCollections] = useState<SharedCollection[]>([])
   const [categories, setCategories] = useState<{ category: string; count: number }[]>([])
   const [loading, setLoading] = useState(true)
-  const [cloningId, setCloningId] = useState<string | null>(null)
-  const [query, setQuery] = useState('')
-  const [searchInput, setSearchInput] = useState('')
-  const [category, setCategory] = useState<string | null>(null)
+  const [cloning, setCloning] = useState<string | null>(null)
+  
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<'popular' | 'recent' | 'most_cloned'>('popular')
 
   useEffect(() => {
+    checkUser()
     loadCategories()
   }, [])
 
   useEffect(() => {
     loadCollections()
-  }, [query, category, sortBy])
+  }, [searchQuery, selectedCategory, sortBy])
+
+  const checkUser = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user)
+  }
 
   const loadCategories = async () => {
     try {
-      const data = await getCollectionCategories()
-      setCategories(data)
+      const cats = await getCollectionCategories()
+      setCategories(cats)
     } catch (error) {
-      console.error('Categories load error:', error)
+      console.warn('Categories could not be loaded:', error instanceof Error ? error.message : error)
+      setCategories([])
     }
   }
 
   const loadCollections = async () => {
     setLoading(true)
     try {
-      const data = await searchPublicCollections(
-        query || null,
-        category,
+      const results = await searchPublicCollections(
+        searchQuery || null,
+        selectedCategory,
         sortBy,
-        24,
-        0
+        50
       )
-      setCollections(data)
+      setCollections(results)
     } catch (error) {
-      console.error('Explore load error:', error)
+      console.error('Error loading collections:', error)
       toast.error('Koleksiyonlar yüklenemedi')
-      setCollections([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setQuery(searchInput.trim() || '')
-  }
-
-  const handleView = (token: string) => {
-    router.push(`/shared/${token}`)
-  }
-
-  const handleClone = async (token: string) => {
+  const handleClone = async (collection: SharedCollection) => {
     if (!user) {
-      router.push(`/login?returnUrl=${encodeURIComponent('/explore')}`)
+      toast.error('Koleksiyonu kopyalamak için giriş yapın')
+      router.push('/login')
       return
     }
 
-    setCloningId(token)
+    setCloning(collection.id)
+
     try {
-      const collectionId = await cloneSharedCollection(token, user.id)
-      toast.success('Koleksiyon hesabınıza kopyalandı!')
-      router.push(`/collections/${collectionId}`)
+      const newCollectionId = await cloneSharedCollection(
+        collection.shareToken,
+        user.id
+      )
+      toast.success('Koleksiyon kopyalandı!')
+      router.push(`/collections/${newCollectionId}`)
     } catch (error) {
-      console.error('Clone error:', error)
+      console.error('Error cloning collection:', error)
       toast.error('Koleksiyon kopyalanamadı')
     } finally {
-      setCloningId(null)
+      setCloning(null)
     }
   }
 
-  const handleCopyLink = async (token: string) => {
-    const url = generateShareUrl(token)
-    try {
-      await navigator.clipboard.writeText(url)
-      toast.success('Link kopyalandı!')
-    } catch {
-      toast.error('Link kopyalanamadı')
-    }
-  }
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    )
+  const handleView = (shareToken: string) => {
+    router.push(`/shared/${shareToken}`)
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 pb-24">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2 mb-2">
-            <Compass size={28} />
-            Keşfet
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            🌍 Topluluk Koleksiyonları
           </h1>
-          <p className="text-gray-400">
-            Topluluk tarafından paylaşılan koleksiyonları keşfedin ve kendi sözlüğünüze ekleyin
+          <p className="text-gray-600 dark:text-gray-400">
+            Diğer kullanıcıların paylaştığı koleksiyonları keşfedin ve kopyalayın
           </p>
-        </header>
+        </div>
 
-        {/* Search & Filters */}
-        <div className="mb-8 space-y-4">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                size={20}
-              />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Koleksiyon ara..."
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        {/* Search and Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+          {/* Search */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Koleksiyon ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Sort */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Sırala:
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSortBy('popular')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  sortBy === 'popular'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                🔥 Popüler
+              </button>
+              <button
+                onClick={() => setSortBy('most_cloned')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  sortBy === 'most_cloned'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                📋 En Çok Kopyalanan
+              </button>
+              <button
+                onClick={() => setSortBy('recent')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  sortBy === 'recent'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                🆕 En Yeni
+              </button>
             </div>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors"
-            >
-              Ara
-            </button>
-          </form>
+          </div>
 
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={category || ''}
-              onChange={(e) => setCategory(e.target.value || null)}
-              className="px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Tüm kategoriler</option>
+          {/* Categories */}
+          <div>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+              Kategori:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  selectedCategory === null
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                Tümü
+              </button>
               {categories.map((cat) => (
-                <option key={cat.category} value={cat.category}>
+                <button
+                  key={cat.category}
+                  onClick={() => setSelectedCategory(cat.category)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    selectedCategory === cat.category
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
                   {cat.category} ({cat.count})
-                </option>
+                </button>
               ))}
-            </select>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="popular">Popüler</option>
-              <option value="recent">En yeni</option>
-              <option value="most_cloned">En çok kopyalanan</option>
-            </select>
+            </div>
           </div>
         </div>
 
-        {/* Results */}
+        {/* Collections Grid */}
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Koleksiyonlar yükleniyor...</p>
           </div>
         ) : collections.length === 0 ? (
-          <div className="text-center py-16 bg-gray-900/50 rounded-xl border border-gray-800">
+          <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Koleksiyon bulunamadı</h3>
-            <p className="text-gray-400 mb-4">
-              Arama kriterlerinizi değiştirmeyi deneyin veya kendi koleksiyonunuzu paylaşın
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Koleksiyon Bulunamadı
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Farklı bir arama terimi veya filtre deneyin
             </p>
-            <button
-              onClick={() => {
-                setQuery('')
-                setSearchInput('')
-                setCategory(null)
-                loadCollections()
-              }}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
-            >
-              Filtreleri Temizle
-            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {collections.map((collection) => (
-              <ExploreCard
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {collections.map((collection, index) => (
+              <motion.div
                 key={collection.id}
-                collection={collection}
-                onView={() => handleView(collection.shareToken)}
-                onClone={() => handleClone(collection.shareToken)}
-                onCopyLink={() => handleCopyLink(collection.shareToken)}
-                cloning={cloningId === collection.shareToken}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden"
+              >
+                {/* Header */}
+                <div
+                  className="p-6 pb-4"
+                  style={{ backgroundColor: `${collection.color}20` }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
+                      style={{ backgroundColor: `${collection.color}40` }}
+                    >
+                      {collection.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    {collection.name}
+                  </h3>
+                  {collection.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {collection.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Stats */}
+                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        {collection.wordCount}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Kelime</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                        {collection.viewCount}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Görüntülenme</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {collection.cloneCount}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Kopyalama</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="px-6 pb-6 flex gap-2">
+                  <button
+                    onClick={() => handleView(collection.shareToken)}
+                    className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    👁️ Görüntüle
+                  </button>
+                  <button
+                    onClick={() => handleClone(collection)}
+                    disabled={cloning === collection.id}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {cloning === collection.id ? '⏳' : '📋'} Kopyala
+                  </button>
+                </div>
+              </motion.div>
             ))}
           </div>
         )}

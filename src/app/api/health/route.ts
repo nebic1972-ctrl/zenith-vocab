@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 
 /**
  * Sağlık kontrolü – deployment / monitoring için.
- * GET /api/health → { ok: true, timestamp }
+ * GET /api/health → { status, timestamp, version, environment }
  */
+export const runtime = "edge";
+
 export async function GET() {
   return NextResponse.json({
-    ok: true,
+    status: "ok",
     timestamp: new Date().toISOString(),
-    version: "2.0",
+    version: "1.0.0",
+    environment: process.env.NODE_ENV,
   });
 }

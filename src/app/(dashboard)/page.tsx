@@ -21,6 +21,7 @@ import DueWordsWidget from '@/components/DueWordsWidget'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getWords, getStats, getSettings } from '@/lib/storage'
+import { toast } from 'sonner'
 
 interface SupabaseWord {
   id: string
@@ -458,10 +459,27 @@ export default function DashboardPage() {
       {/* Import Words Modal */}
       {user?.id && (
         <ImportWordsModal
-          isOpen={showImportModal}
-          onClose={() => setShowImportModal(false)}
-          userId={user.id}
-          onImported={() => fetchWords()}
+          open={showImportModal}
+          onOpenChange={setShowImportModal}
+          onImport={async (words) => {
+            try {
+              const supabase = createClient()
+              const wordsToImport = words.map((word) => ({
+                user_id: user.id,
+                word,
+                translation: 'Çeviri bekleniyor',
+                category: 'daily',
+                level: 'B1',
+                mastery_level: 0,
+              }))
+              const { error } = await supabase.from('vocabulary_words').insert(wordsToImport)
+              if (error) throw error
+              toast.success(`${words.length} kelime eklendi!`)
+              fetchWords()
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : 'Kelimeler eklenemedi')
+            }
+          }}
         />
       )}
     </div>

@@ -96,11 +96,11 @@ export default function AddWordModal({ isOpen, onClose, onWordAdded }: AddWordMo
       soundManager.playSuccess()
       haptics.success()
       toast.success('📖 Sözlükten hızlıca dolduruldu!')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Dictionary error:', error)
       soundManager.playError()
       haptics.error()
-      toast.error(error.message || 'Sözlük hatası')
+      toast.error(error instanceof Error ? error.message : 'Sözlük hatası')
     } finally {
       setDictionaryLoading(false)
     }

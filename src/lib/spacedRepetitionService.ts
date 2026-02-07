@@ -33,8 +33,25 @@ export interface DailyReviewStats {
   accuracy: number
 }
 
+function mapRowToDueWord(word: Record<string, unknown>): DueWord {
+  return {
+    id: String(word.id),
+    word: String(word.word ?? ''),
+    translation: String(word.translation ?? ''),
+    definition: word.definition != null ? String(word.definition) : null,
+    example_sentence: word.example_sentence != null ? String(word.example_sentence) : null,
+    level: String(word.level ?? 'B1'),
+    category: String(word.category ?? 'daily'),
+    next_review_date: word.next_review_date != null ? String(word.next_review_date) : null,
+    easiness_factor: Number(word.easiness_factor) || 2.5,
+    repetitions: Number(word.repetitions) || 0,
+    review_interval: Number(word.review_interval) || 0
+  }
+}
+
 /**
  * Get words due for review
+ * RPC başarısız olursa (migration yoksa) doğrudan tablo sorgusu kullanır.
  */
 export async function getDueWords(
   userId: string,
@@ -49,21 +66,38 @@ export async function getDueWords(
     p_limit: limit
   })
 
-  if (error) throw error
+  if (!error && data != null) {
+    return (Array.isArray(data) ? data : []).map((word: Record<string, unknown>) => mapRowToDueWord(word))
+  }
 
-  return data.map((word: any) => ({
-    id: word.id,
-    word: word.word,
-    translation: word.translation,
-    definition: word.definition,
-    example_sentence: word.example_sentence,
-    level: word.level,
-    category: word.category,
-    next_review_date: word.next_review_date,
-    easiness_factor: word.easiness_factor || 2.5,
-    repetitions: word.repetitions || 0,
-    review_interval: word.review_interval || 0
-  }))
+  // RPC yoksa veya hata verirse: doğrudan vocabulary_words sorgusu (fallback)
+  const dueFilter = 'next_review_date.is.null,next_review_date.lte.' + new Date().toISOString()
+  let query = supabase
+    .from('vocabulary_words')
+    .select('id, word, translation, definition, example_sentence, level, category, next_review_date, easiness_factor, repetitions, review_interval')
+    .eq('user_id', userId)
+    .or(dueFilter)
+    .order('next_review_date', { ascending: true, nullsFirst: true })
+    .limit(limit)
+
+  if (collectionId) {
+    const { data: cw } = await supabase
+      .from('collection_words')
+      .select('word_id')
+      .eq('collection_id', collectionId)
+    const wordIds = (cw ?? []).map((r: { word_id: string }) => r.word_id)
+    if (wordIds.length === 0) return []
+    query = query.in('id', wordIds)
+  }
+
+  const { data: rows, error: queryError } = await query
+
+  if (queryError) {
+    console.warn('get_due_words RPC failed, fallback query also failed:', queryError.message)
+    throw queryError
+  }
+
+  return (rows ?? []).map(mapRowToDueWord)
 }
 
 /**

@@ -1,14 +1,21 @@
+'use client'
+
 /**
  * Metin çıkarma modülü
  * PDF, TXT, MD, EPUB, DOCX ve yapıştırılmış metin için tek bir API sağlar.
+ * PDF işleme (pdfjs-dist) sadece gerektiğinde dinamik yüklenir - canvas hatasını önler.
  */
-
-import { extractTextFromPDF as extractFromPdfFile } from './pdfProcessor'
 
 export type ExtractResult = {
   text: string
   wordCount: number
   source: 'pdf' | 'txt' | 'md' | 'epub' | 'docx' | 'paste'
+  metadata?: {
+    title?: string
+    author?: string
+    subject?: string
+    pageCount?: number
+  }
 }
 
 export interface ExtractedWord {
@@ -45,13 +52,19 @@ export async function extractTextFromFile(file: File): Promise<ExtractResult> {
   const name = file.name.toLowerCase()
   const type = file.type
 
-  // PDF
+  // PDF - dinamik import (pdfjs-dist canvas gerektirir, sadece PDF seçildiğinde yükle)
   if (type === 'application/pdf' || name.endsWith('.pdf')) {
-    const text = await extractFromPdfFile(file)
+    const { extractTextFromPDF } = await import('@/lib/pdfProcessor')
+    const result = await extractTextFromPDF(file)
+    const text = result.text
     return {
       text: normalizeText(text),
       wordCount: textToWords(text).length,
-      source: 'pdf'
+      source: 'pdf',
+      metadata: {
+        ...result.metadata,
+        pageCount: result.pageCount
+      }
     }
   }
 
@@ -197,4 +210,80 @@ export function analyzeText(text: string): {
     frequency,
     topWords: sortedWords.slice(0, 100)
   }
+}
+
+/**
+ * Metinden kelimeleri çıkar ve temizle (gelişmiş seçeneklerle)
+ */
+export function extractWords(
+  text: string,
+  options: {
+    minLength?: number
+    maxLength?: number
+    removeCommon?: boolean
+    caseSensitive?: boolean
+  } = {}
+): string[] {
+  const {
+    minLength = 3,
+    maxLength = 20,
+    removeCommon = true,
+    caseSensitive = false
+  } = options
+
+  let words = text
+    .split(/\s+/)
+    .map(word => {
+      const cleaned = word.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ'-]/g, '')
+      return caseSensitive ? cleaned : cleaned.toLowerCase()
+    })
+    .filter(word => word.length >= minLength && word.length <= maxLength)
+
+  if (removeCommon) {
+    const commonWords = new Set([
+      'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+      'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+      'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
+      'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their',
+      'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go',
+      'me', 'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
+      'take', 'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them',
+      'see', 'other', 'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over',
+      'think', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work',
+      'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these',
+      'give', 'day', 'most', 'us', 'is', 'was', 'are', 'been', 'has', 'had',
+      'were', 'said', 'did', 'having', 'may', 'should', 'am'
+    ])
+    words = words.filter(word => !commonWords.has(word.toLowerCase()))
+  }
+
+  return Array.from(new Set(words)).sort()
+}
+
+/**
+ * Dosya tipinin desteklenip desteklenmediğini kontrol et
+ */
+export function isSupportedFileType(file: File): boolean {
+  const supportedTypes = [
+    'text/plain',
+    'application/pdf',
+    'application/epub+zip',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ]
+  const supportedExtensions = ['.txt', '.md', '.pdf', '.epub', '.docx', '.doc']
+  return (
+    supportedTypes.some(t => file.type.toLowerCase().includes(t)) ||
+    supportedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+  )
+}
+
+/**
+ * Dosya boyutunu formatla
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
 }
