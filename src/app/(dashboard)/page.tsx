@@ -397,8 +397,15 @@ export default function DashboardPage() {
           className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
         >
           <span className="text-xl">📄</span>
-          <span>Dosyadan Yükle</span>
+          <span>Metin/Dosya Yükle</span>
         </motion.button>
+        <Link
+          href="/texts/new"
+          className="bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all block"
+        >
+          <h3 className="text-lg font-bold mb-2">📚 Metin/Kitap Ekle</h3>
+          <p className="text-sm opacity-90">PDF, EPUB, DOC, TXT yükle</p>
+        </Link>
         <Link
           href="/flashcards"
           className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all block"

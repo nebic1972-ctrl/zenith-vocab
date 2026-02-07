@@ -1,5 +1,8 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isOnboardingCompleted } from '@/lib/auth/auth-utils'
+
+const authRoutes = ['/login', '/register', '/onboarding']
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -69,6 +72,8 @@ export async function updateSession(request: NextRequest) {
   const publicRoutes = [
     '/login',
     '/register',
+    '/onboarding',
+    '/verify-email',
     '/auth/login',
     '/auth/register',
     '/auth/callback',
@@ -80,22 +85,37 @@ export async function updateSession(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(route + '/')
   )
 
+  // Oturum yok + korumalı route → /login
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  if (
-    user &&
-    (pathname === '/login' ||
-      pathname === '/register' ||
-      pathname === '/auth/login' ||
-      pathname === '/auth/register')
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+  // Oturum var
+  if (user) {
+    // Auth sayfasındayken → onboarding/dashboard'a yönlendir
+    const isAuthRoute = authRoutes.some(
+      (route) => pathname === route || pathname.startsWith(route + '/')
+    )
+    if (isAuthRoute && pathname !== '/onboarding') {
+      const url = request.nextUrl.clone()
+      url.pathname = isOnboardingCompleted(user.user_metadata)
+        ? '/'
+        : '/onboarding'
+      return NextResponse.redirect(url)
+    }
+
+    // Onboarding tamamlanmamış + public olmayan route (onboarding hariç) → /onboarding
+    if (
+      !isOnboardingCompleted(user.user_metadata) &&
+      pathname !== '/onboarding' &&
+      !isPublicRoute
+    ) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/onboarding'
+      return NextResponse.redirect(url)
+    }
   }
 
   return response

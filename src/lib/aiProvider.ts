@@ -1,3 +1,5 @@
+import { getPublicGoogleApiKey } from '@/lib/config';
+
 export type QuizItem = {
   q: string;
   a: string[];
@@ -80,9 +82,9 @@ function extractJson(text: string): string {
   return codeBlock ? codeBlock[1].trim() : trimmed;
 }
 
-// .env.local: NEXT_PUBLIC_GEMINI_API_KEY (client-side quiz)
+// Client-side quiz - NEXT_PUBLIC_* vars
 export const generateQuiz = async (content: string): Promise<QuizItem[] | null> => {
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = getPublicGoogleApiKey();
 
   if (!apiKey?.trim()) {
     console.warn("NEXT_PUBLIC_GEMINI_API_KEY bulunamadı (.env.local). Simülasyon modunda çalışıyor.");

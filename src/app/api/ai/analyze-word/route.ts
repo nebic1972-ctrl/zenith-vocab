@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getGoogleApiKey } from '@/lib/config'
 
-// ✅ Sizin anahtarınızla uyumlu çalışan Hızlı Model
-// Tüm AI özellikleri gemini-2.5-flash kullanıyor
-const GEMINI_MODEL = 'gemini-2.5-flash' 
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '')
+const GEMINI_MODEL = 'gemini-2.5-flash'
+const apiKey = getGoogleApiKey()
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null
 
 export async function POST(request: Request) {
   try {
+    if (!genAI) {
+      return NextResponse.json(
+        { error: 'API Key yapılandırılmamış. .env.local dosyasını kontrol edin.' },
+        { status: 500 }
+      )
+    }
     // 1. Veriyi Al
     const body = await request.json()
     const { word, context } = body

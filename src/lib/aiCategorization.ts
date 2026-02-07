@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getPublicGoogleApiKey } from '@/lib/config'
 
-const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ''
+const GEMINI_API_KEY = getPublicGoogleApiKey()
 
 export interface WordAnalysis {
   categories: Array<{

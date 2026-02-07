@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import MetricCard from '@/components/MetricCard'
 import AddWordModal from '@/components/AddWordModal'
+import ImportWordsModal from '@/components/ImportWordsModal'
 import DarkModeToggle from '@/components/DarkModeToggle'
 import { motion } from 'framer-motion'
 import {
@@ -19,6 +20,7 @@ import {
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getWords, getStats, getSettings } from '@/lib/storage'
+import { toast } from 'sonner'
 
 interface SupabaseWord {
   id: string
@@ -32,6 +34,7 @@ interface SupabaseWord {
 export default function DashboardPage() {
   const { user } = useAuth()
   const [showAddWordModal, setShowAddWordModal] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
   const [stats, setStats] = useState({
     totalWords: 0,
     learned: 0,
@@ -388,6 +391,22 @@ export default function DashboardPage() {
           <span className="text-xl">➕</span>
           <span>Yeni Kelime Ekle</span>
         </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowImportModal(true)}
+          className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+        >
+          <span className="text-xl">📄</span>
+          <span>Metin/Dosya Yükle</span>
+        </motion.button>
+        <Link
+          href="/texts/new"
+          className="bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all block"
+        >
+          <h3 className="text-lg font-bold mb-2">📚 Metin/Kitap Ekle</h3>
+          <p className="text-sm opacity-90">PDF, EPUB, DOC, TXT yükle</p>
+        </Link>
         <Link
           href="/flashcards"
           className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
@@ -438,10 +457,35 @@ export default function DashboardPage() {
       <AddWordModal
         isOpen={showAddWordModal}
         onClose={() => setShowAddWordModal(false)}
-        onWordAdded={() => {
-          fetchWords()
-        }}
+        onWordAdded={() => fetchWords()}
       />
+
+      {/* Import Words Modal */}
+      {user?.id && (
+        <ImportWordsModal
+          open={showImportModal}
+          onOpenChange={setShowImportModal}
+          onImport={async (words) => {
+            try {
+              const supabase = createClient()
+              const wordsToImport = words.map((word) => ({
+                user_id: user.id,
+                word,
+                translation: 'Çeviri bekleniyor',
+                category: 'daily',
+                level: 'B1',
+                mastery_level: 0,
+              }))
+              const { error } = await supabase.from('vocabulary_words').insert(wordsToImport)
+              if (error) throw error
+              toast.success(`${words.length} kelime eklendi!`)
+              fetchWords()
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : 'Kelimeler eklenemedi')
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

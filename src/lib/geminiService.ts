@@ -4,14 +4,11 @@
  */
 
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai'
+import { getGoogleApiKey, getPublicGoogleApiKey } from '@/lib/config'
 
 const GEMINI_MODEL = 'gemini-2.5-flash'
 
-const apiKey =
-  process.env.NEXT_PUBLIC_GOOGLE_GENERATIVE_AI_API_KEY ||
-  process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
-  ''
+const apiKey = getPublicGoogleApiKey() || getGoogleApiKey()
 
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null
 

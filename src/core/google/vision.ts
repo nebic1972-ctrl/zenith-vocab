@@ -2,8 +2,8 @@
 
 /**
  * Google Cloud Vision API (OCR) - sadece server tarafında.
- * .env.local: GOOGLE_CLOUD_VISION_API_KEY, GOOGLE_CLOUD_API_KEY (fallback)
  */
+import { getGoogleVisionApiKey } from "@/lib/config";
 
 export interface DetectDocumentTextResult {
   success: true;
@@ -24,13 +24,11 @@ export async function detectDocumentText(
   imageBase64: string
 ): Promise<DetectDocumentTextResponse> {
   try {
-    const apiKey =
-      process.env.GOOGLE_CLOUD_VISION_API_KEY?.trim() ||
-      process.env.GOOGLE_CLOUD_API_KEY?.trim();
+    const apiKey = getGoogleVisionApiKey();
     if (!apiKey) {
       return {
         success: false,
-        error: "GOOGLE_CLOUD_VISION_API_KEY veya GOOGLE_CLOUD_API_KEY tanımlı değil (.env.local)",
+        error: "GOOGLE_CLOUD_VISION_API_KEY tanımlı değil (.env.local)",
       };
     }
 

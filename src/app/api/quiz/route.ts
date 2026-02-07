@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getGoogleApiKey } from "@/lib/config";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { text } = body;
 
-    // .env.local: GOOGLE_GENERATIVE_AI_API_KEY
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-
-    if (!apiKey?.trim()) {
+    const apiKey = getGoogleApiKey();
+    if (!apiKey) {
       throw new Error("GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil (.env.local)");
     }
 

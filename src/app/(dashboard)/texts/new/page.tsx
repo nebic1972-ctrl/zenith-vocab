@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, ArrowLeft, Upload, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { extractTextFromFile, isSupportedFileType } from '@/lib/textExtractor'
 
 export default function NewTextPage() {
   const router = useRouter()
@@ -61,19 +62,30 @@ export default function NewTextPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.type !== 'text/plain') {
-      setError('Sadece .txt dosyaları desteklenmektedir')
+    if (!isSupportedFileType(file)) {
+      setError('Desteklenmeyen dosya. PDF, EPUB, DOC, DOCX, TXT veya MD yükleyin.')
       return
     }
 
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Dosya çok büyük. Maksimum 10MB.')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
     try {
-      const text = await file.text()
-      setContent(text)
+      const result = await extractTextFromFile(file)
+      setContent(result.text)
       if (!title) {
-        setTitle(file.name.replace('.txt', ''))
+        const baseName = file.name.replace(/\.(pdf|epub|docx?|txt|md)$/i, '')
+        setTitle(baseName)
       }
-    } catch {
-      setError('Dosya okunamadı')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Dosya okunamadı')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -130,7 +142,7 @@ export default function NewTextPage() {
                 <Input
                   id="file"
                   type="file"
-                  accept=".txt"
+                  accept=".txt,.md,.pdf,.epub,.doc,.docx"
                   onChange={handleFileUpload}
                   disabled={loading}
                   className="cursor-pointer"
@@ -138,7 +150,7 @@ export default function NewTextPage() {
                 <Upload className="h-5 w-5 text-slate-400" />
               </div>
               <p className="text-xs text-slate-500">
-                Sadece .txt dosyaları desteklenmektedir
+                PDF, EPUB, DOC, DOCX, TXT veya MD (maks 10MB)
               </p>
             </div>
 

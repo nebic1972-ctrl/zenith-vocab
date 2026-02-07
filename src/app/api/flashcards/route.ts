@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFlashcard } from '@/core/google/gemini';
+import { getGoogleApiKey } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    const apiKey = getGoogleApiKey();
+    if (!apiKey) {
       console.error('❌ GOOGLE_GENERATIVE_AI_API_KEY tanımlanmamış!');
       return NextResponse.json(
         { error: 'API Key tanımlanmamış' },

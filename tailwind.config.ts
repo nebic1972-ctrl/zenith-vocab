@@ -20,6 +20,10 @@ const config = {
   	},
   	extend: {
   		colors: {
+  			'deep-blue': '#0a192f',
+  			'neuro-gold': '#d4af37',
+  			'accent-blue': '#64ffda',
+  			'text-gray': '#8892b0',
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -94,6 +98,9 @@ const config = {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			blob: 'blob 10s ease-in-out infinite'
+  		},
+  		fontFamily: {
+  			sans: ['Inter', 'system-ui', 'sans-serif'],
   		}
   	}
   },

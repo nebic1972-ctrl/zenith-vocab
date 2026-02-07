@@ -1,14 +1,12 @@
 'use server'
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getGoogleApiKey } from '@/lib/config'
 
 export type { GeminiAnalysis } from '@/lib/geminiService'
-// ✅ Madem 2.5 sende sorunsuz çalışıyordu, rotayı oraya sabitliyoruz:
-const GEMINI_MODEL = 'gemini-2.5-flash'; 
+const GEMINI_MODEL = 'gemini-2.5-flash'
 
-// Eğer üstteki hata verirse, paneldeki tam isme sadık kal:
-
-const apiKey = process.env.NEXT_PUBLIC_GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+const apiKey = getGoogleApiKey()
 
 // ✅ HATA: if (!apiKey) throw new Error(...) satırını SİLDİK.
 // Bu sayede uygulama anahtar olmasa bile açılacak, sadece AI kısımları çalışmayacak.

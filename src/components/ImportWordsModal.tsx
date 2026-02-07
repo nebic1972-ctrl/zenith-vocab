@@ -27,7 +27,7 @@ export default function ImportWordsModal({
     if (!selectedFile) return
 
     if (!isSupportedFileType(selectedFile)) {
-      toast.error('Desteklenmeyen dosya türü. Lütfen TXT, PDF veya DOCX seçin.')
+      toast.error('Desteklenmeyen dosya. PDF, EPUB, DOC, DOCX, TXT veya MD seçin.')
       return
     }
 
@@ -88,7 +88,7 @@ export default function ImportWordsModal({
             <input
               type="file"
               id="file-upload"
-              accept=".txt,.pdf,.docx,.md,.epub"
+              accept=".txt,.md,.pdf,.epub,.doc,.docx"
               onChange={handleFileSelect}
               disabled={processing}
               className="hidden"
@@ -109,7 +109,7 @@ export default function ImportWordsModal({
                   {processing ? 'İşleniyor...' : 'Dosya yüklemek için tıklayın'}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  TXT, PDF, DOCX, MD veya EPUB (maks 10MB)
+                  PDF, EPUB, DOC, DOCX, TXT veya MD (maks 10MB)
                 </p>
               </div>
             </label>

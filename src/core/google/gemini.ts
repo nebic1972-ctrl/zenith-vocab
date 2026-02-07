@@ -3,6 +3,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText, generateObject } from "ai";
 import { z } from "zod";
+import { getGoogleApiKey } from "@/lib/config";
 
 const flashcardSchema = z.object({
   front: z.string().describe("Kelimenin Türkçe anlamı"),
@@ -28,10 +29,13 @@ export type GenerateFlashcardResult = GenerateFlashcardSuccess | GenerateFlashca
 // Gemini 2.5 Flash - kararlı ve hızlı model
 const GEMINI_MODEL = 'gemini-2.5-flash';
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta',
-});
+const apiKeyForInit = getGoogleApiKey();
+const google = apiKeyForInit
+  ? createGoogleGenerativeAI({
+      apiKey: apiKeyForInit,
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta',
+    })
+  : null;
 
 /** Tek kelime/kavram için flashcard (createFlashcardFromSelection için). */
 export async function generateFlashcard(
@@ -39,8 +43,8 @@ export async function generateFlashcard(
   context: string = ""
 ): Promise<GenerateFlashcardResult> {
   try {
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-    if (!apiKey) {
+    const apiKey = getGoogleApiKey();
+    if (!apiKey || !google) {
       console.error("❌ API Key bulunamadı!");
       return {
         success: false,
@@ -116,8 +120,7 @@ export async function generateFlashcardsFromText(
   text: string
 ): Promise<{ success: true; cards: Array<{ front: string; back: string }> } | { success: false; error: string }> {
   try {
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-    if (!apiKey?.trim()) {
+    if (!google) {
       return { success: false, error: "GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil (.env.local)" };
     }
 
