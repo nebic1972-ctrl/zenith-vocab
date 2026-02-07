@@ -40,7 +40,7 @@ export default function RegisterPage() {
       if (data.session) {
          toast.success("Hesap oluşturuldu! Panele yönlendiriliyorsunuz.");
          router.refresh();
-         router.push('/'); 
+         router.push('/dashboard'); 
       } else {
          // Bazen e-posta onayı (Confirm Email) gerekebilir. 
          // Eğer Supabase ayarlarında "Confirm Email" açıksa session null gelir.

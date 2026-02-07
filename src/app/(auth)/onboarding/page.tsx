@@ -35,7 +35,7 @@ export default function OnboardingPage() {
       return
     }
     if (user.user_metadata?.onboarding_completed) {
-      router.replace('/')
+      router.replace('/dashboard')
     }
   }, [user, authLoading, router])
 
@@ -60,7 +60,7 @@ export default function OnboardingPage() {
       })
 
       toast.success('Profiliniz hazır! 🎉')
-      router.push('/')
+      router.push('/dashboard')
       router.refresh()
     } catch (err) {
       toast.error('Bir hata oluştu. Lütfen tekrar deneyin.')

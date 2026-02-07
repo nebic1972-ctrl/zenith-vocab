@@ -19,7 +19,7 @@ export default function RegisterForm() {
   useEffect(() => {
     if (authLoading || !user) return
     const completed = Boolean(user.user_metadata?.onboarding_completed)
-    router.replace(completed ? '/' : '/onboarding')
+    router.replace(completed ? '/dashboard' : '/onboarding')
   }, [user, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {

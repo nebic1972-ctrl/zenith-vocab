@@ -52,7 +52,7 @@ export default function CommandMenu() {
         <Command.Empty className="py-6 text-center text-sm text-zinc-500">Sonuç bulunamadı.</Command.Empty>
 
         <Command.Group heading="Navigasyon" className="text-xs font-bold text-zinc-500 mb-2 px-2">
-          <Item onSelect={() => runCommand(() => router.push('/'))}>
+          <Item onSelect={() => runCommand(() => router.push('/dashboard'))}>
             <LayoutDashboard className="mr-2 h-4 w-4" /> Ana Sayfa
           </Item>
           <Item onSelect={() => runCommand(() => router.push('/library'))}>

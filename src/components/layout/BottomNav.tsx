@@ -6,7 +6,7 @@ import { Home, Library, Trophy, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { label: 'Ana Sayfa', href: '/', icon: Home },
+  { label: 'Ana Sayfa', href: '/dashboard', icon: Home },
   { label: 'Kütüphane', href: '/library', icon: Library },
   { label: 'Sıralama', href: '/leaderboard', icon: Trophy },
   { label: 'Profil', href: '/profile', icon: User },
@@ -24,7 +24,7 @@ export default function BottomNav() {
         <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href || 
-              (item.href !== '/' && pathname.startsWith(item.href));
+              (item.href !== '/dashboard' && pathname.startsWith(item.href));
             
             return (
               <Link

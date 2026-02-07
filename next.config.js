@@ -84,12 +84,6 @@ const nextConfig = {
     unoptimized: process.env.NODE_ENV === 'development'
   },
 
-  async rewrites() {
-    return [
-      { source: '/favicon.ico', destination: '/icon-192.png' }
-    ]
-  },
-
   serverExternalPackages: ['resend', 'canvas', 'pdfjs-dist']
 }
 

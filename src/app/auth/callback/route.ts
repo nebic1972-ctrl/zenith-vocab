@@ -49,9 +49,8 @@ export async function GET(request: Request) {
     })
   }
 
-  // Onboarding kontrolü - ana sayfa "/" (dashboard)
   const onboardingDone = isOnboardingCompleted(user.user_metadata)
-  const redirectTo = onboardingDone ? '/' : '/onboarding'
+  const redirectTo = onboardingDone ? '/dashboard' : '/onboarding'
 
   return NextResponse.redirect(`${base}${redirectTo}`)
 }

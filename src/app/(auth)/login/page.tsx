@@ -28,7 +28,7 @@ function LoginContent() {
   useEffect(() => {
     if (authLoading || !user) return
     const completed = Boolean(user.user_metadata?.onboarding_completed)
-    router.replace(completed ? '/' : '/onboarding')
+    router.replace(completed ? '/dashboard' : '/onboarding')
   }, [user, authLoading, router])
 
   if (authLoading || (user && !loading)) {
