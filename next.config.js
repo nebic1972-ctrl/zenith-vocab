@@ -85,9 +85,9 @@ const nextConfig = {
     unoptimized: process.env.NODE_ENV === 'development'
   },
 
-  async redirects() {
+  async rewrites() {
     return [
-      { source: '/favicon.ico', destination: '/icon-192.png', permanent: true }
+      { source: '/favicon.ico', destination: '/icon-192.png' }
     ]
   },
 

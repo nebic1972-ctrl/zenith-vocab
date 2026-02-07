@@ -1,5 +1,7 @@
 import DashboardLayoutClient from "@/components/layout/DashboardLayoutClient";
 
+export const dynamic = 'force-dynamic';
+
 export default function DashboardLayout({
   children,
 }: {
