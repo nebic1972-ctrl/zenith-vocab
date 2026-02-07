@@ -12,7 +12,6 @@ const path = require('path')
 
 const nextConfig = {
   reactStrictMode: false,
-  output: 'standalone',
 
   typescript: {
     ignoreBuildErrors: true
