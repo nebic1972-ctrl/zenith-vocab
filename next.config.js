@@ -70,13 +70,14 @@ const nextConfig = {
   },
 
   experimental: {
-    turbo: {
-      resolveAlias: {
-        canvas: path.resolve(__dirname, 'src/lib/empty-module.js'),
-        encoding: path.resolve(__dirname, 'src/lib/empty-module.js')
-      }
-    },
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
+  },
+
+  turbopack: {
+    resolveAlias: {
+      canvas: path.resolve(__dirname, 'src/lib/empty-module.js'),
+      encoding: path.resolve(__dirname, 'src/lib/empty-module.js')
+    }
   },
 
   images: {
