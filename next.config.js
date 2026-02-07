@@ -75,8 +75,8 @@ const nextConfig = {
 
   turbopack: {
     resolveAlias: {
-      canvas: path.resolve(__dirname, 'src/lib/empty-module.js'),
-      encoding: path.resolve(__dirname, 'src/lib/empty-module.js')
+      canvas: path.resolve(process.cwd(), 'src/lib/empty-module.js'),
+      encoding: path.resolve(process.cwd(), 'src/lib/empty-module.js')
     }
   },
 
