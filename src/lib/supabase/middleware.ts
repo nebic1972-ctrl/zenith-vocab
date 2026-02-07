@@ -72,6 +72,26 @@ export async function updateSession(request: NextRequest) {
     return response
   }
 
+  // PWA ve statik dosyalar - auth kontrolü yapma (manifest, icon, sw vb.)
+  const staticPaths = [
+    '/manifest.json',
+    '/manifest.webmanifest',
+    '/sw.js',
+    '/offline.html',
+    '/icon-192.png',
+    '/icon-512.png',
+    '/icon-192x192.png',
+    '/icon-512x512.png',
+    '/icon.svg',
+    '/icons',
+  ]
+  if (staticPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+    return response
+  }
+  if (/\.(svg|png|jpg|jpeg|gif|webp|ico|json|js)$/i.test(pathname)) {
+    return response
+  }
+
   // Public routes
   const publicRoutes = [
     '/login',
