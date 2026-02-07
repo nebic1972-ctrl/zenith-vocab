@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFlashcard } from '@/core/google/gemini';
 import { getGoogleApiKey } from '@/lib/config';
+import { requireAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.response) return auth.response;
+
     const body = await request.json();
     const { word, context } = body;
 

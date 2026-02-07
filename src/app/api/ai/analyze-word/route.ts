@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getGoogleApiKey } from '@/lib/config'
+import { requireAuth } from '@/lib/apiAuth'
 
 const GEMINI_MODEL = 'gemini-2.5-flash'
 const apiKey = getGoogleApiKey()
@@ -8,6 +9,9 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAuth()
+    if (auth.response) return auth.response
+
     if (!genAI) {
       return NextResponse.json(
         { error: 'API Key yapılandırılmamış. .env.local dosyasını kontrol edin.' },

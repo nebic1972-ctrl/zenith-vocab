@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 import { generateFlashcardHint } from '@/lib/services/gemini'
+import { requireAuth } from '@/lib/apiAuth'
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAuth()
+    if (auth.response) return auth.response
+
     // 1. Gelen veriyi alalım
     const body = await request.json()
     const { word, definition } = body

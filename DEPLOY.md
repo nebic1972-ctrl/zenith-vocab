@@ -35,3 +35,25 @@ git push origin main
 ```
 
 Vercel otomatik deploy eder. İlk deploy sonrası **Redeploy** yapın (env değişkenleri için).
+
+---
+
+## Güvenlik (Supabase RLS + API)
+
+### 4. Supabase SQL Migration – Güvenlik Sertleştirme
+
+**Supabase Dashboard → SQL Editor** içinde `supabase_migration_security_hardening.sql` dosyasını çalıştırın.
+
+Bu migration şunları yapar:
+- `get_user_preferences`: Sadece kendi tercihlerini okuyabilir
+- `bulk_operations`, `vocabulary_sets`: Yalnızca `authenticated` kullanıcılar erişebilir
+- `word_reviews`: Kelime kullanıcıya ait olmalı
+- `profiles`: Sadece kendi profil, admin istisnası
+- `storage`: Sadece kendi yüklediği dosyayı silebilir
+- `SECURITY DEFINER` fonksiyonlarda `search_path` sabitlenir
+
+### 5. API Güvenliği
+
+- `/api/ai/*`, `/api/quiz`, `/api/flashcards`: Giriş yapmış kullanıcı gerekir
+- `/api/cron/*`: `CRON_SECRET` ile korunur (Vercel Cron job)
+- `/api/health`, `/api/og`: Herkese açık (monitoring, Open Graph)

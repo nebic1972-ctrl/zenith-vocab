@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getGoogleApiKey } from "@/lib/config";
+import { requireAuth } from "@/lib/apiAuth";
 
 export async function POST(req: Request) {
   try {
+    const auth = await requireAuth();
+    if (auth.response) return auth.response;
+
     const body = await req.json();
     const { text } = body;
 
